@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>WIDGET SPINNER</title>
+		<meta name="viewport" content="width=device-width,user-scalable=yes" />
+		<style>
+			body, html {
+			  height: 100%;
+			  display: grid;
+			}
+			span {
+			  margin: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<span id="label">
+			LABEL
+		</span>
+		<script type="text/javascript">
+			// get the label element
+			const label = document.getElementById('label')
+
+			// keep track of the previous angle's degrees
+			let previous = 0
+			// and the total degrees rotated
+			let total = 0
+
+			// listen for rotation events
+			window.addEventListener('deviceorientation', e => {
+				// get the change in angle
+				let phi = Math.abs(e.alpha - previous)
+				// add the change, inverted if it's greater than 180
+				total += phi < 180 ? phi : 360 - phi
+				// remember the previous
+				previous = e.alpha
+				// update the label
+				label.innerHTML = Math.floor(total/36)/10
+				// update the label's rotation
+				label.style.transform = `rotate(${e.alpha}deg)`
+			})
+		</script>
+	</body>
+</html>
