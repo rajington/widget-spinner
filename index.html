@@ -33,10 +33,10 @@
 		</div>
 		<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 		<script type="text/javascript">
-			// prevent scrolling
-			document.ontouchmove = event => {
-			    event.preventDefault()
-			}
+			// keep track of the previous angle's degrees
+			let previous = 0
+			// and the total degrees rotated
+			let rotations = 0
 
 			// get the container
 			const container = document.getElementById('container')
@@ -49,36 +49,35 @@
 				height: 256,
 			})
 
-			// keep track of the previous angle's degrees
-			let previous = 0
-			// and the total degrees rotated
-			let total = 0
+			// prevent scrolling
+			document.ontouchmove = event => {
+			    event.preventDefault()
+			}
+
+			// add a qrcode click listener
+			document.getElementById('qrcode').onclick = () => {
+				const message = encodeURIComponent(
+					`I was there for spin #${Math.floor(rotations)}! #widgetspinner https://github.com/rajington/widget-spinner`
+				)
+
+				qrcode.makeCode(
+					`twitter://post?message=${message}&in_reply_to_status_id=924410083219472384`
+				)
+			}
 
 			// listen for rotation events
 			window.addEventListener('deviceorientation', e => {
 				// get the change in angle
 				const phi = Math.abs(e.alpha - previous)
 				// add the change, inverted if it's greater than 180
-				total += phi < 180 ? phi : 360 - phi
+				rotations += (phi < 180 ? phi : 360 - phi)/360
 				// remember the previous
 				previous = e.alpha
 			})
 
 			window.setInterval(() => {
-				// calculate rotations
-				const rotations = total/360
 				// update the label
 				label.innerHTML = rotations.toFixed(1)
-
-				// message to prefix tweet
-				const message = encodeURIComponent(
-					`I was there for spin #${Math.floor(rotations)}! #widgetspinner https://github.com/rajington/widget-spinner`
-				)
-
-
-				qrcode.makeCode(
-					`twitter://post?message=${message}&in_reply_to_status_id=924410083219472384`
-				)
 				// update the label's rotation
 				container.style.transform = `rotate(${previous}deg)`
 			}, 1000/60)
