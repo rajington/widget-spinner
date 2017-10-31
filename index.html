@@ -2,25 +2,48 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
 		<title>WIDGET SPINNER</title>
 		<meta name="viewport" content="width=device-width,user-scalable=yes" />
 		<style>
 			body, html {
 			  height: 100%;
-			  display: grid;
+			  display: flex;
+				align-items: center;
+				justify-content: center;
 			}
-			span {
-			  margin: auto;
+			#label {
+				text-align: center;
+				font-size: 50px;
+			}
+			.social {
+				width: 100px;
+				padding: 14px;
 			}
 		</style>
 	</head>
 	<body>
-		<span id="label">
-			LABEL
-		</span>
+		<div id="container">
+			<div id="label">LABEL</div>
+			<div id="qrcode"></div>
+			<div>
+				<img src="./twitter.png" class="social" />
+				<img src="./link.png" class="social" />
+			</div>
+		</div>
+		<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 		<script type="text/javascript">
-			// get the label element
+
+			// get the container
+			const container = document.getElementById('container')
+			// get the label
 			const label = document.getElementById('label')
+			// get the QR code
+			const qrcode = new QRCode('qrcode', {
+				text: "https://rajington.github.io/widget-spinner/",
+				width: 256,
+				height: 256,
+			})
 
 			// keep track of the previous angle's degrees
 			let previous = 0
@@ -30,16 +53,31 @@
 			// listen for rotation events
 			window.addEventListener('deviceorientation', e => {
 				// get the change in angle
-				let phi = Math.abs(e.alpha - previous)
+				const phi = Math.abs(e.alpha - previous)
 				// add the change, inverted if it's greater than 180
 				total += phi < 180 ? phi : 360 - phi
 				// remember the previous
 				previous = e.alpha
-				// update the label
-				label.innerHTML = Math.floor(total/36)/10
-				// update the label's rotation
-				label.style.transform = `rotate(${e.alpha}deg)`
 			})
+
+			window.setInterval(() => {
+				// calculate rotations
+				const rotations = total/360
+				// update the label
+				label.innerHTML = rotations.toFixed(1)
+
+				// message to prefix tweet
+				const message = encodeURIComponent(
+					`I was there for spin #${Math.floor(rotations)}! #widgetspinner https://github.com/rajington/widget-spinner`
+				)
+
+
+				qrcode.makeCode(
+					`twitter://post?message=${message}&in_reply_to_status_id=924410083219472384`
+				)
+				// update the label's rotation
+				container.style.transform = `rotate(${previous}deg)`
+			}, 1000/60)
 		</script>
 	</body>
 </html>
