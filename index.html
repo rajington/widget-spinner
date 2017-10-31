@@ -33,6 +33,10 @@
 		</div>
 		<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 		<script type="text/javascript">
+			// prevent scrolling
+			document.ontouchmove = event => {
+			    event.preventDefault()
+			}
 
 			// get the container
 			const container = document.getElementById('container')
